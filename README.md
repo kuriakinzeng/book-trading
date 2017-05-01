@@ -1,6 +1,6 @@
-# Free Code Camp's Chart the Stock Market Basecamp Challenge
+# Free Code Camp's Manage a Book Trading Club Basecamp Challenge
 
-**tl;dr:** This app allows users visualize the recent trend lines for stocks
+**tl;dr:** This app allows users trade books
 
 ## User Stories:
 1. I can view all books posted by every user.
