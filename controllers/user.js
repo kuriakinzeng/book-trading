@@ -3,6 +3,7 @@ const crypto = bluebird.promisifyAll(require('crypto'));
 const nodemailer = require('nodemailer');
 const passport = require('passport');
 const User = require('../models/User');
+const Book = require('../models/Book');
 
 /**
  * GET /login
@@ -113,10 +114,18 @@ exports.postSignup = (req, res, next) => {
  * GET /account
  * Profile page.
  */
-exports.getAccount = (req, res) => {
-  res.render('account/profile', {
-    title: 'Account Management'
-  });
+exports.getAccount = (req, res, next) => {
+  Book.find({ owner: req.user.id }, (err, myBooks) => {
+    if(err) return next(err);
+    Book.find({ requestor: req.user.id }, (err, booksRequested) => {
+      if(err) return next(err);
+      res.render('account/profile', {
+        title: 'Account Management',
+        books: myBooks,
+        booksRequested
+      });
+    })
+  })
 };
 
 /**
@@ -139,7 +148,8 @@ exports.postUpdateProfile = (req, res, next) => {
     user.email = req.body.email || '';
     user.profile.name = req.body.name || '';
     user.profile.gender = req.body.gender || '';
-    user.profile.location = req.body.location || '';
+    user.profile.city = req.body.city || '';
+    user.profile.state = req.body.state || '';
     user.profile.website = req.body.website || '';
     user.save((err) => {
       if (err) {
@@ -287,7 +297,7 @@ exports.postReset = (req, res, next) => {
     };
     return transporter.sendMail(mailOptions)
       .then(() => {
-        req.flash('success', { msg: 'Success! Your password has been changed.' });    
+        req.flash('success', { msg: 'Success! Your password has been changed.' });
       });
   };
 

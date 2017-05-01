@@ -1,27 +1,26 @@
 extends layout
 
 block content
-  h1 Hackathon Starter
-  p.lead A boilerplate for Node.js web applications.
+  h1 Books Available
   hr
   .row
-    .col-sm-6
-      h2 Heading
-      p Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-      p
-        a.btn.btn-default(href='#', role='button') View details »
-    .col-sm-6
-      h2 Heading
-      p Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-      p
-        a.btn.btn-default(href='#', role='button') View details »
-    .col-sm-6
-      h2 Heading
-      p Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-      p
-        a.btn.btn-default(href='#', role='button') View details »
-    .col-sm-6
-      h2 Heading
-      p Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-      p
-        a.btn.btn-default(href='#', role='button') View details »
+    each book in books
+      .col-xs-6.col-sm-4.col-md-3
+        .thumbnail
+          .caption
+            h4
+              a(href=book.url,target="_blank")=book.title
+            if (user && user._id == book.requestor)
+              if(book.requestApproved)
+                p Approved
+              else
+                form.form-horizontal(action='/cancelRequest', method='POST')
+                  input(type='hidden', name='_csrf', value=_csrf)
+                  input(type='hidden', name='_id', value=book._id)
+                  button.btn.btn-xs.requestBtn(type='submit') Cancel Request  
+            else if (user && user._id != book.owner)
+              form.form-horizontal(action='/submitRequest', method='POST')
+                input(type='hidden', name='_csrf', value=_csrf)
+                input(type='hidden', name='_id', value=book._id)
+                input(type='hidden', name='name', value=book.title)
+                button.btn.btn-primary.btn-xs.requestBtn(type='submit') Request

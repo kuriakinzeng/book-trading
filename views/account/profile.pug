@@ -2,8 +2,81 @@ extends ../layout
 
 block content
   .page-header
-    h3 Profile Information
+    h3 Post a Book
+  .row    
+  form.form-horizontal(action='/create', method='POST')
+    input(type='hidden', name='_csrf', value=_csrf)
+    .form-group
+      label.col-sm-3.control-label(for='title') Title
+      .col-sm-7
+        input.form-control(type='text', name='title')
+    .form-group
+      label.col-sm-3.control-label(for='url') URL
+      .col-sm-7
+        input.form-control(type='text', name='url')
+    .form-group
+      .col-sm-offset-3.col-sm-4
+        button.btn.btn.btn-default(type='submit') Create
 
+  .page-header
+    h3 Requests Received
+  .row
+  each book in books
+    if book.requestor
+      .col-xs-9.col-sm-9.col-md-4 
+        a(href=book.url)=book.title
+      .col-xs-3.col-sm-3.col-md-8
+        if book.requestApproved
+            p Approved
+        else
+          form.form-horizontal(action='/approveRequest', method='POST')
+            input(type='hidden', name='_csrf', value=_csrf)
+            input(type='hidden', name='_id', value=book._id)
+            button.btn.btn-success(name="approveRequest",type='submit') Approve
+
+  .page-header
+    h3 Requests Sent
+  .row  
+  if booksRequested.length == 0
+    p No requests sent
+  each bookReq in booksRequested
+    .col-xs-9.col-sm-9.col-md-4
+      p=bookReq.title
+    .col-xs-3.col-sm-3.col-md-8
+      if bookReq.requestApproved
+        p Approved
+      else
+        p Pending
+
+
+  .page-header
+    h3 My Books
+  .row
+  if books.length == 0
+    p No books posted yet.
+  each book in books
+    form.form-horizontal(action='/update', method='POST')
+      input(type='hidden', name='_csrf', value=_csrf)
+      .form-group
+        label.col-sm-3.control-label(for='title') Title
+        .col-sm-7
+          input.form-control(type='text', name='title', value=book.title)
+      .form-group
+        label.col-sm-3.control-label(for='url') URL
+        .col-sm-7
+          input.form-control(type='text', name='url', value=book.url)
+      .form-group
+        .col-sm-offset-3.col-sm-4
+          button.btn.btn-default(type='submit') Update
+    form.form-horizontal(action='/delete', method='POST')
+      input(type='hidden', name='_csrf', value=_csrf)
+      input(type='hidden', name='_id', value=book._id)
+      .form-group
+        .col-sm-offset-3.col-sm-4
+          button.btn.btn.btn-danger(type='submit') Delete
+
+  .page-header
+    h3 Profile
   form.form-horizontal(action='/account/profile', method='POST')
     input(type='hidden', name='_csrf', value=_csrf)
     .form-group
@@ -15,25 +88,13 @@ block content
       .col-sm-7
         input.form-control(type='text', name='name', id='name', value=user.profile.name)
     .form-group
-      label.col-sm-3.control-label Gender
-      .col-sm-6
-        label.radio.col-sm-3
-          input(type='radio', checked=user.profile.gender=='male', name='gender', value='male', data-toggle='radio')
-          span Male
-        label.radio.col-sm-3
-          input(type='radio', checked=user.profile.gender=='female', name='gender', value='female', data-toggle='radio')
-          span Female
-        label.radio.col-sm-3
-          input(type='radio', checked=user.profile.gender=='other', name='gender', value='other', data-toggle='radio')
-          span Other
-    .form-group
-      label.col-sm-3.control-label(for='location') Location
+      label.col-sm-3.control-label(for='city') City
       .col-sm-7
-        input.form-control(type='text', name='location', id='location', value=user.profile.location)
+        input.form-control(type='text', name='city', id='city', value=user.profile.city)
     .form-group
-      label.col-sm-3.control-label(for='website') Website
+      label.col-sm-3.control-label(for='state') State
       .col-sm-7
-        input.form-control(type='text', name='website', id='website', value=user.profile.website)
+        input.form-control(type='text', name='state', id='state', value=user.profile.state)
     .form-group
       label.col-sm-3.control-label Gravatar
       .col-sm-4
@@ -43,69 +104,3 @@ block content
         button.btn.btn.btn-primary(type='submit')
           i.fa.fa-pencil
           | Update Profile
-
-  .page-header
-    h3 Change Password
-
-  form.form-horizontal(action='/account/password', method='POST')
-    input(type='hidden', name='_csrf', value=_csrf)
-    .form-group
-      label.col-sm-3.control-label(for='password') New Password
-      .col-sm-7
-        input.form-control(type='password', name='password', id='password')
-    .form-group
-      label.col-sm-3.control-label(for='confirmPassword') Confirm Password
-      .col-sm-7
-        input.form-control(type='password', name='confirmPassword', id='confirmPassword')
-    .form-group
-      .col-sm-offset-3.col-sm-4
-        button.btn.btn-primary(type='submit')
-          i.fa.fa-lock
-          | Change Password
-
-  .page-header
-    h3 Delete Account
-
-  form.form-horizontal(action='/account/delete', method='POST')
-    .form-group
-      p.col-sm-offset-3.col-sm-4 You can delete your account, but keep in mind this action is irreversible.
-      input(type='hidden', name='_csrf', value=_csrf)
-      .col-sm-offset-3.col-sm-4
-        button.btn.btn-danger(type='submit')
-          i.fa.fa-trash
-          | Delete my account
-
-  .page-header
-    h3 Linked Accounts
-  .form-horizontal
-    .form-group
-      .col-sm-offset-3.col-sm-4
-        if user.instagram
-          p: a.text-danger(href='/account/unlink/instagram') Unlink your Instagram account
-        else
-          p: a(href='/auth/instagram') Link your Instagram account
-      .col-sm-offset-3.col-sm-4
-        if user.google
-          p: a.text-danger(href='/account/unlink/google') Unlink your Google account
-        else
-          p: a(href='/auth/google') Link your Google account
-      .col-sm-offset-3.col-sm-4
-        if user.facebook
-          p: a.text-danger(href='/account/unlink/facebook') Unlink your Facebook account
-        else
-          p: a(href='/auth/facebook') Link your Facebook account
-      .col-sm-offset-3.col-sm-4
-        if user.twitter
-          p: a.text-danger(href='/account/unlink/twitter') Unlink your Twitter account
-        else
-          p: a(href='/auth/twitter') Link your Twitter account
-      .col-sm-offset-3.col-sm-4
-        if user.github
-          p: a.text-danger(href='/account/unlink/github') Unlink your GitHub account
-        else
-          p: a(href='/auth/github') Link your GitHub account
-      .col-sm-offset-3.col-sm-4
-        if user.linkedin
-          p: a.text-danger(href='/account/unlink/linkedin') Unlink your LinkedIn account
-        else
-          p: a(href='/auth/linkedin') Link your LinkedIn account
