@@ -3,13 +3,13 @@
 **tl;dr:** This app allows users visualize the recent trend lines for stocks
 
 ## User Stories:
-1. I can view a graph displaying the recent trend lines for each added stock
-2. I can add new stocks by their symbol name
-3. I can remove stocks
-4. I can see changes in real-time when any other user adds or removes a stock. For this you will need to use Web Sockets
+1. I can view all books posted by every user.
+2. I can add a new book.
+3. I can update my settings to store my full name, city, and state.
+4. I can propose a trade and wait for the other user to accept the trade.
 
 ## Architecture
-The app is built on Express with Socket.io support and server-rendering Vue. It uses [hackathon-starter](https://github.com/sahat/hackathon-starter) as a boilerplate.
+The app is built on Express. It uses [hackathon-starter](https://github.com/sahat/hackathon-starter) as a boilerplate.
 
 ## Run locally
 ```npm install && npm run dev```
